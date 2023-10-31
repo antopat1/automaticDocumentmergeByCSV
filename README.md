@@ -5,6 +5,8 @@ The script, based on the Weasyprint library for HTML/CSS manipulation, allows yo
 Since Weasyprint by default can only be run on Linux systems, to run the script from Windows it is first necessary to enable WSL and install the Ubuntu distribution of Linux using the PowerShell command:
 wsl --install
 
+On the project base folder, remember to create the empty folder: "ps_calusco_23_24"
+
 ## Library to install in virtualenv:
 * Jinja2
 * WeasyPrint
