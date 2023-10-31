@@ -1,0 +1,14 @@
+segre
+
+cd /mnt/c/Users/NotebookSegr1
+
+cd Desktop
+
+cd primo_soccorso 
+
+
+source env/bin/activate
+
+python generatore_nomine_ps.py
+
+
