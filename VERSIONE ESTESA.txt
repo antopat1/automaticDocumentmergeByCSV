@@ -1,0 +1,94 @@
+#VERSIONE ESTESA#
+
+
+import csv
+import os
+from jinja2 import Environment, FileSystemLoader
+from weasyprint import HTML, CSS
+
+def generate_form(data, output_path):
+    env = Environment(loader=FileSystemLoader('.'))
+    template = env.get_template('Modelloperdichiarazionedocenti20232024templat.html')
+    
+    rendered_html = template.render(data)
+    
+    html = HTML(string=rendered_html)
+
+
+    css = CSS(string='''
+    @page {
+        size: A4;
+        margin: 0;
+    }
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 10px; /* Riduciamo la dimensione del testo */
+        line-height: 1; /* Riduciamo lo spaziamento tra le righe */
+        margin-top: -105px; /* Margine superiore negativo */      
+    }
+    .container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        page-break-inside: avoid;
+    }
+    .section {
+        page-break-inside: avoid;
+    }
+    ''')
+    
+    html.write_pdf(output_path, stylesheets=[css])
+
+def read_csv(file_path):
+    with open(file_path, newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            yield row
+
+
+
+def process_csv(csv_path):
+    output_folder = "outputLayout"  # Cartella di output
+    os.makedirs(output_folder, exist_ok=True)  # Creazione della cartella se non esiste
+    
+    for row in read_csv(csv_path):
+        try:
+            # Ignora le righe vuote
+            if not row:
+                continue
+            
+            # Escludi le chiavi None
+            row = {k: v for k, v in row.items() if k is not None}
+
+            doc_data = {k.strip(): (v.strip() if v else '') for k, v in row.items()}
+            
+            # Check and handle the case where only the name is given
+            if 'nomeDocente' not in doc_data or not doc_data['nomeDocente']:
+                continue
+            
+            output_filename = f"{doc_data['nomeDocente'].replace(' ', '_')}.pdf"
+            output_path = os.path.join(output_folder, output_filename)
+            
+            generate_form(doc_data, output_path)
+            print(f"Processing: {doc_data['nomeDocente']}")
+
+        except Exception as e:
+            print(f"Error processing row: {row}")
+            print(e)
+
+
+
+
+if __name__ == "__main__":
+    csv_path = 'newOrigin.csv'
+    process_csv(csv_path)
+    print("Generazione dei PDF completata.")
+
+
+
+
+
+
